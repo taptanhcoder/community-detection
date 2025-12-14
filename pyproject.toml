@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "osnclusters"
+version = "0.1.0"
+description = "Community detection on social networks + checkins (Phase 2)"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.24",
+  "pandas>=2.0",
+  "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+torch = ["torch>=2.1"]
+sklearn = ["scikit-learn>=1.3"]
+igraph = ["igraph>=0.11", "leidenalg>=0.10"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
