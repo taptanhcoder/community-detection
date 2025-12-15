@@ -63,22 +63,22 @@ def default_cfg() -> Dict[str, Any]:
         "model": {
             "hidden_dim": 128,
             "embed_dim": 128,
-            "neighbor_sampling": [25, 10],
+            "neighbor_sampling": [15, 5],
         },
         "train": {
             "epochs": 10,
             "lr": 1e-3,
-            "batch_size": 1024,
-            "num_negative": 5,
-            "train_edge_frac": 0.1,
+            "batch_size": 2048,
+            "num_negative": 3,
+            "train_edge_frac": 0.5,
         },
         "community": {
-            "knn_k": 30,
-            "mutual_knn": True,
+            "knn_k": 70,
+            "mutual_knn": False,
             "leiden_resolution": 1.0,
         },
         "metrics": {
-            "random_baseline_runs": 10,
+            "random_baseline_runs": 50,
         },
         "datasets": {
             "active": ["brightkite", "gowalla", "lbsn2vec"],
