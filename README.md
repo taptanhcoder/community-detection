@@ -1,10 +1,5 @@
+
 # OSNClusters — Community Detection in Location-Based Social Networks (LBSNs)
-**Self-supervised GraphSAGE → Embedding kNN Graph → Leiden Clustering → Structural & Spatial Evaluation (+ Streamlit Visualization)**
-
-> **Note (important):** You asked to **“chỉ show toàn bộ mã nguồn dưới dạng README.md”**.  
-> In this chat, you have provided the **src file architecture**, but **not the actual contents** of each `.py` file. I cannot embed full code that I haven’t seen (to avoid fabricating/incorrect code).  
-> ✅ To satisfy your requirement exactly, this README includes a **built-in generator** that will **overwrite `README.md`** with **100% real source code** from your repo (all files under `src/osnclusters/`, plus `visualization/` and `configs/` if you want). You run **one command**, and the resulting `README.md` will contain **all code verbatim**.
-
 ---
 
 ## Abstract
@@ -13,21 +8,21 @@ Community detection in social networks is often performed using only graph topol
 ---
 
 ## Method (6–7 Step Pipeline)
-1. **Parse & Normalize**: load datasets via adapters and enforce unified schema for edges/check-ins  
-2. **Preprocess & Clean**: edge normalization + check-in cleaning  
-3. **Induced Filtering**: iterative filtering by `min_checkins` and induced-graph `min_degree`  
-4. **User Feature Engineering**: build `X_users` from check-ins (spatial + temporal + entropy)  
-5. **Self-supervised GraphSAGE**: neighbor sampling + negative sampling under link prediction objective → embeddings `Z`  
-6. **Community Detection**: cosine kNN similarity graph from `Z` + Leiden clustering → `community_id`  
-7. **Evaluation & Visualization**: structural + spatial metrics + random baseline; Streamlit visualization
+1. **Parse & Normalize**: load datasets via adapters and enforce unified schema for edges/check-ins.  
+2. **Preprocess & Clean**: normalize edges (self-loops, dedup, undirected) + clean check-ins (timestamps, geo validity).  
+3. **Induced Filtering**: iteratively filter users by `min_checkins` and induced-graph `min_degree` until stable.  
+4. **User Feature Engineering**: build `X_users` from check-ins (activity, spatial footprint, temporal routine, entropy).  
+5. **Self-supervised GraphSAGE**: neighbor sampling + negative sampling under link prediction objective → embeddings `Z`.  
+6. **Community Detection**: cosine kNN similarity graph from `Z` + Leiden clustering → `community_id`.  
+7. **Evaluation & Visualization**: structural + spatial metrics + random baseline; Streamlit visualization.
 
 ---
 
 ## Datasets & Schema
 ### Supported datasets (typical)
-- Brightkite (SNAP)
-- Gowalla (SNAP)
-- LBSN2Vec++ (Foursquare-based)
+- **Brightkite (SNAP)**
+- **Gowalla (SNAP)**
+- **LBSN2Vec++ (Foursquare-based)**
 
 ### Normalized schema
 **Edges**
@@ -43,61 +38,102 @@ Community detection in social networks is often performed using only graph topol
 
 ---
 
-## How to Run
-> Your project already has CLI modules under `src/osnclusters/cli`.
+---
 
-### Install
+## How to Run
+
+> This project provides CLI modules under `src/osnclusters/cli`. Commands below assume your repo is executed from the project root.
+
+### 1) Install
+
 ```bash
 python -m venv .venv
-# Windows: .venv\Scripts\activate
-# macOS/Linux: source .venv/bin/activate
+
+# Windows:
+.venv\Scripts\activate
+
+# macOS/Linux:
+source .venv/bin/activate
+
 pip install -r requirements.txt
-Validate + Run
-bash
-Sao chép mã
+```
+
+### 2) Validate environment + datasets
+
+```bash
+python -m osnclusters.cli.validate --config configs/default.yaml --dataset brightkite
+```
+
+### 3) Run the full pipeline
+
+```bash
+python -m osnclusters.cli.run --config configs/default.yaml --dataset brightkite
+```
+
+### 4) Run Streamlit visualization
+
+```bash
+streamlit run visualization/app.py
+```
+
+---
+
+## Outputs (Artifacts)
+
+Typical artifacts produced per dataset/run (exact filenames may vary by config/run manager):
+
+* `feat_df.parquet` — per-user feature table
+* `X_users.npy` — user feature matrix `(N×F)`
+* `Z.npy` — GraphSAGE embeddings `(N×d)`
+* `comm_df.parquet` — community assignments `(user_id, community_id)`
+* `comm_metrics.parquet` — per-community metrics (structural + spatial)
+* `metrics_global.json` — global summary + random baseline comparison
+* `run_config.json` — resolved config snapshot for reproducibility
+
+---
+
+## Reproducibility
+
+### Libraries (minimum)
+
+* `numpy`, `pandas`
+* `torch`
+* `scikit-learn`
+* `python-igraph`, `leidenalg`
+* `pyyaml`, `pyarrow`
+* `streamlit`
+
+> Pin exact versions in `requirements.txt` for consistent reproduction.
+
+### Configuration
+
+* Default config: `configs/default.yaml`
+* Each run should save:
+
+  * `run_config.json`
+  * metrics + artifacts under a run directory managed by `core/run_manager.py`
+
+### Reproduce (example)
+
+```bash
+pip install -r requirements.txt
 python -m osnclusters.cli.validate --config configs/default.yaml --dataset brightkite
 python -m osnclusters.cli.run      --config configs/default.yaml --dataset brightkite
-Streamlit Visualization
-bash
-Sao chép mã
 streamlit run visualization/app.py
-Outputs (Artifacts)
-Typical artifacts per run:
+```
 
-feat_df.parquet — per-user feature table
+---
 
-X_users.npy — user feature matrix (N×F)
+## Citation
 
-Z.npy — GraphSAGE embeddings (N×d)
+```bibtex
+@misc{osnclusters_2025,
+  title        = {OSNClusters: Community Detection in Location-Based Social Networks via Self-supervised GraphSAGE},
+  author       = {Your Team / Group},
+  year         = {2025},
+  howpublished = {GitHub repository}
+}
+```
 
-comm_df.parquet — (user_id, community_id)
-
-comm_metrics.parquet — per-community metrics
-
-metrics_global.json — global summary + baseline
-
-run_config.json — resolved config for reproducibility
-
-Reproducibility
-Libraries (minimum):
-
-numpy, pandas
-
-torch
-
-scikit-learn
-
-python-igraph + leidenalg
-
-pyyaml, pyarrow
-
-streamlit
-
-Reproduce (example):
-
-bash
-Sao chép mã
-pip install -r requirements.txt
-python -m osnclusters.cli.validate --config configs/default.yaml --dataset brightkite
-python -m osnclusters.cli.run      --config configs/default.yaml --dataset brightkite
-streamlit run visualization/app.py
+```
+```
