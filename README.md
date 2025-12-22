@@ -124,16 +124,3 @@ streamlit run visualization/app.py
 
 ---
 
-## Citation
-
-```bibtex
-@misc{osnclusters_2025,
-  title        = {OSNClusters: Community Detection in Location-Based Social Networks via Self-supervised GraphSAGE},
-  author       = {Your Team / Group},
-  year         = {2025},
-  howpublished = {GitHub repository}
-}
-```
-
-```
-```
