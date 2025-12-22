@@ -5,6 +5,7 @@
 ## Abstract
 Community detection in social networks is often performed using only graph topology (friendship edges), which may miss real-world similarity in users’ spatio-temporal behavior. This project studies community discovery in **Location-Based Social Networks (LBSN: social graph + check-in trajectories)** by integrating **user mobility/temporal features** with **graph representation learning**. We first engineer per-user behavioral features from check-ins, then learn user embeddings using **GraphSAGE (Graph Sample-and-Aggregate)** trained with neighbor sampling and link prediction. Communities are obtained by building an embedding-based **kNN similarity graph (k-Nearest Neighbors)** and applying **Leiden clustering**. We evaluate community quality via **structural cohesion** (e.g., modularity, intra-density) and **spatial cohesion** (distance-to-community-centroid), including a **random baseline** via size-preserving label shuffling. A Streamlit dashboard supports qualitative inspection through embedding, geographic, and graph-layout views.
 
+![Visualization Dashboard](images/visualization.png)
 ---
 
 ## Method 
