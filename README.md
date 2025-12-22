@@ -1,10 +1,10 @@
-````markdown
 ## Abstract
 Community detection in social networks is often performed using only graph topology (friendship edges), which may miss real-world similarity in users’ spatio-temporal behavior. This project studies community discovery in **Location-Based Social Networks (LBSN: social graph + check-in trajectories)** by integrating **user mobility/temporal features** with **graph representation learning**. We first engineer per-user behavioral features from check-ins, then learn user embeddings using **GraphSAGE (Graph Sample-and-Aggregate: inductive GNN embeddings)** trained with neighbor sampling and link prediction. Communities are obtained by building an embedding-based **kNN similarity graph (k-Nearest Neighbors)** and applying **Leiden clustering**. We evaluate community quality from two angles: **structural cohesion** (e.g., modularity, intra-density) and **spatial cohesion** (distance-to-community-centroid), including a **random baseline** via label shuffling to verify non-random geographic coherence. An interactive Streamlit dashboard supports qualitative inspection through embedding, geographic, and graph-layout views.
 
 ---
 
 ## Method (6-Step Pipeline)
+
 1. **Parse & Normalize**
    - Parse raw dataset files and enforce a unified schema for edges and check-ins.
    - Output standardized `edges_final` and `checkins_final`.
@@ -36,12 +36,14 @@ Community detection in social networks is often performed using only graph topol
 ---
 
 ## Datasets & Schema
+
 ### Supported datasets (typical)
 - **Brightkite (SNAP)**
 - **Gowalla (SNAP)**
 - **LBSN2Vec++ (Foursquare-based)**
 
 ### Normalized schema
+
 **Edges table**
 - Required columns:
   - `u`: user_id (string)
@@ -57,25 +59,26 @@ Community detection in social networks is often performed using only graph topol
   - `venue_id` (string)
   - `category` (string)
 
-
 ---
 
 ## How to Run
 
-> If your project is notebook-based (Step 0 → Step 8), run notebooks in order, then start Streamlit.
+> If your project is notebook-based (Step 0 → Step 8), run notebooks in order, then start Streamlit.  
 > If your project provides python entrypoints, use the commands below (adapt module names to your repo).
 
 ### 1) Install
 
 ```bash
 python -m venv .venv
+
 # Windows:
 .venv\Scripts\activate
+
 # macOS/Linux:
 source .venv/bin/activate
 
 pip install -r requirements.txt
-```
+````
 
 ### 2) Run pipeline (conceptual commands)
 
@@ -116,7 +119,7 @@ streamlit run visualization/app.py
 The pipeline typically produces the following artifacts per dataset/run:
 
 * `X_users.npy` — user feature matrix (N×F)
-* `feat_df.parquet` — feature table with user_id index and named columns
+* `feat_df.parquet` — feature table with `user_id` index and named columns
 * `Z.npy` — GraphSAGE embeddings (N×d)
 * `comm_df.parquet` — community assignments: `(user_id, community_id)`
 * `comm_metrics.parquet` — per-community metrics (structural + spatial)
