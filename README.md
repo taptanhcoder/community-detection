@@ -7,7 +7,7 @@ Community detection in social networks is often performed using only graph topol
 
 ---
 
-## Method (6–7 Step Pipeline)
+## Method 
 1. **Parse & Normalize**: load datasets via adapters and enforce unified schema for edges/check-ins.  
 2. **Preprocess & Clean**: normalize edges (self-loops, dedup, undirected) + clean check-ins (timestamps, geo validity).  
 3. **Induced Filtering**: iteratively filter users by `min_checkins` and induced-graph `min_degree` until stable.  
