@@ -5,10 +5,7 @@ import pandas as pd
 
 
 def make_undirected_dedup(edges: pd.DataFrame) -> pd.DataFrame:
-    """
-    Enforce undirected edges by ordering endpoints (u<=v), drop self-loops, deduplicate.
-    Expects columns: u, v
-    """
+
     u = edges["u"].astype(str).to_numpy()
     v = edges["v"].astype(str).to_numpy()
     u2 = np.where(u <= v, u, v)
@@ -26,10 +23,7 @@ def degree_from_edges(edges: pd.DataFrame) -> pd.Series:
 
 
 def filter_induced_once(edges: pd.DataFrame, chk: pd.DataFrame, k: int, d: int):
-    """
-    Keep users with >=k checkins and >=d degree, and induce subgraph + checkins.
-    Returns (v_keep_index, edges2, chk2)
-    """
+
     ccount = chk["user_id"].astype(str).value_counts()
     deg = degree_from_edges(edges)
 
@@ -44,10 +38,7 @@ def filter_induced_once(edges: pd.DataFrame, chk: pd.DataFrame, k: int, d: int):
 
 
 def iterative_filter(edges: pd.DataFrame, chk: pd.DataFrame, k: int, d: int, iterative: bool = True, max_rounds: int = 20):
-    """
-    Iteratively apply induced filtering until convergence or max_rounds.
-    Returns (users_final_df, edges_final, checkins_final, history)
-    """
+
     edges_tmp = edges.copy()
     chk_tmp = chk.copy()
 

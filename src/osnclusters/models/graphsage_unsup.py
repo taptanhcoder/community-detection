@@ -8,7 +8,7 @@ import pandas as pd
 
 def _require_torch():
     try:
-        import torch  # noqa
+        import torch  
         return True
     except Exception:
         return False
@@ -61,11 +61,7 @@ def train_graphsage_unsup(
     train_edge_frac: float = 0.1,
     logger=None,
 ):
-    """
-    Minimal GraphSAGE (mean aggregator) unsupervised via link prediction loss.
-    Mirrors Phase 1 Step 5.
-    Returns: Z (N, embed_dim), model
-    """
+    
     if not _require_torch():
         raise RuntimeError("GraphSAGE step requires PyTorch. Install extras: pip install -e .[torch]")
 
@@ -81,7 +77,7 @@ def train_graphsage_unsup(
     id2idx, idx2id = build_id_maps(users_final)
     adj = build_adj_list(edges_final, id2idx)
 
-    # positive edges
+
     pos_u = []
     pos_v = []
     for u, v in zip(edges_final["u"].astype(str), edges_final["v"].astype(str)):
@@ -95,7 +91,7 @@ def train_graphsage_unsup(
     if len(pos_u) == 0:
         raise ValueError("No positive edges after filtering. Check preprocess outputs.")
 
-    # subsample edges
+
     if train_edge_frac < 1.0:
         m = len(pos_u)
         m_sub = max(1, int(m * train_edge_frac))
@@ -207,7 +203,7 @@ def train_graphsage_unsup(
         if logger:
             logger.info(f"[C5] epoch {ep}/{epochs} | avg_loss={(total_loss / max(1, num_batches)):.4f}")
 
-    # Inference over all nodes
+
     model.eval()
     Z = np.zeros((N, embed_dim), dtype=np.float32)
     with torch.no_grad():

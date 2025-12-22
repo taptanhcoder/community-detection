@@ -74,7 +74,6 @@ def load_lbsn2vec_curated_with_pois(
     seed: int,
     chunksize: int = 2_000_000,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
-    # sample users (like Phase 1)
     keep_users = None
     if sample_frac < 1.0:
         keep_users = sample_users_from_checkins_chunked(checkins_path, sample_frac, seed, chunksize=chunksize)

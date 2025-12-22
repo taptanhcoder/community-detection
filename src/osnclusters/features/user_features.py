@@ -30,10 +30,7 @@ def build_user_features_from_checkins(
     log1p_counts: bool = True,
     standardize: bool = True,
 ):
-    """
-    Build per-user feature matrix X_users (float32) + feature dataframe.
-    Mirrors Phase 1 Step 4.
-    """
+
     chk = checkins_final.copy()
     chk["user_id"] = chk["user_id"].astype(str)
     chk["venue_id"] = chk["venue_id"].astype(str)
@@ -55,7 +52,7 @@ def build_user_features_from_checkins(
     std_lat = g["lat"].std(ddof=0).fillna(0.0).rename("std_lat")
     std_lon = g["lon"].std(ddof=0).fillna(0.0).rename("std_lon")
 
-    # Radius of gyration + median distance to centroid
+
     rog = {}
     med_dist = {}
     for uid, sub in g:

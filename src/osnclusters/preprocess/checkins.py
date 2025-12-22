@@ -5,10 +5,7 @@ import numpy as np
 
 
 def clean_checkins(chk: pd.DataFrame, cfg: dict) -> pd.DataFrame:
-    """
-    Standardize + drop missing essentials + lat/lon sanity + normalize ts to UTC naive.
-    Output columns: user_id, ts, lat, lon, venue_id (venue_id optional but preferred)
-    """
+
     lat_lo, lat_hi = cfg["preprocess"]["lat_range"]
     lon_lo, lon_hi = cfg["preprocess"]["lon_range"]
 
@@ -27,7 +24,7 @@ def clean_checkins(chk: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     out = out.dropna(subset=["user_id", "ts", "lat", "lon", "venue_id"])
     out = out[(out["lat"] >= lat_lo) & (out["lat"] <= lat_hi) & (out["lon"] >= lon_lo) & (out["lon"] <= lon_hi)]
 
-    # normalize to UTC-naive
+
     try:
         if hasattr(out["ts"].dt, "tz") and out["ts"].dt.tz is not None:
             out["ts"] = out["ts"].dt.tz_convert("UTC").dt.tz_localize(None)

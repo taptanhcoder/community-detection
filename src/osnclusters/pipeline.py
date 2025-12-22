@@ -62,7 +62,7 @@ def run_one_dataset(
     if logger:
         logger.info(f"[RUN] dataset={dataset_name} | source={spec.source} | sample_frac={sample_frac} | train_edge_frac={train_edge_frac}")
 
-    # Step 1: load raw -> parse
+
     if spec.source == "SNAP":
         if spec.edges_path is None or spec.checkins_path is None:
             raise FileNotFoundError(f"SNAP dataset spec missing files: {dataset_name}")
@@ -99,13 +99,13 @@ def run_one_dataset(
         lon_ok = float(pd.to_numeric(checkins_raw["lon"], errors="coerce").notna().mean()) if "lon" in checkins_raw.columns and len(checkins_raw) else 0.0
         logger.info(f"[C1] edges_raw={edges_raw.shape} | checkins_raw={checkins_raw.shape} | ts_ok={ts_ok:.3f} lat_ok={lat_ok:.3f} lon_ok={lon_ok:.3f}")
 
-    # Step 2: cleaning
+
     if logger:
         logger.info("[C2] cleaning edges/checkins ...")
     edges_clean = make_undirected_dedup(edges_raw)
     checkins_clean = clean_checkins(checkins_raw, cfg)
 
-    # Step 3: induced filtering
+
     k = int(cfg["preprocess"].get("min_checkins", 10))
     d = int(cfg["preprocess"].get("min_degree", 3))
     iterative = bool(cfg["preprocess"].get("iterative_filter", True))
@@ -117,7 +117,7 @@ def run_one_dataset(
     if logger:
         logger.info(f"[C3] DONE users={len(users_final)} edges={len(edges_final)} checkins={len(checkins_final)} | last={history[-1] if history else None}")
 
-    # Step 4: build X_users
+
     if logger:
         logger.info("[C4] building user features ...")
     X_users, feat_df, feature_names = build_user_features_from_checkins(
@@ -129,7 +129,7 @@ def run_one_dataset(
     if logger:
         logger.info(f"[C4] X_users shape={X_users.shape} | n_features={len(feature_names)}")
 
-    # Step 5: GraphSAGE
+
     if logger:
         logger.info("[C5] training GraphSAGE ...")
     m_cfg = cfg.get("model", {})
@@ -152,7 +152,7 @@ def run_one_dataset(
     if logger:
         logger.info(f"[C5] Z shape={Z.shape}")
 
-    # Step 6: kNN + Leiden
+
     c_cfg = cfg.get("community", {})
     knn_k = int(c_cfg.get("knn_k", 30))
     mutual_knn = bool(c_cfg.get("mutual_knn", True))
@@ -160,7 +160,7 @@ def run_one_dataset(
     if logger:
         logger.info(f"[C6] kNN graph k={knn_k} mutual={mutual_knn} resolution={resolution}")
 
-    # (Nếu bạn đã áp dụng bản fix weight âm ở knn_graph/leiden thì giữ nguyên call này)
+
     src, dst, w = build_knn_edges_cosine(Z, k=knn_k, mutual=mutual_knn)
     labels, info = leiden_partition_from_edges(n_nodes=Z.shape[0], src=src, dst=dst, w=w, resolution=resolution)
 
@@ -180,15 +180,15 @@ def run_one_dataset(
     if logger:
         logger.info(f"[C6] stats: {comm_stats}")
 
-    # Step 7: metrics
+
     if logger:
         logger.info("[C7] metrics: spatial + structural + random baseline ...")
 
-    # 7.1 Spatial cohesion
+
     user_centroids = compute_user_centroids(checkins_final)
     comm_spatial = spatial_cohesion_metrics(comm_df, user_centroids)
 
-    # 7.3 Semantic cohesion (ONLY for LBSN2Vec, optional if data has venue/category)
+
     comm_semantic = None
     if spec.source == "LBSN2Vec":
         try:
@@ -208,14 +208,14 @@ def run_one_dataset(
             if logger:
                 logger.warning(f"[C7] semantic cohesion skipped. Reason: {type(e).__name__}: {e}")
 
-    # merge per-community metrics into one table
+
     comm_metrics = comm_spatial.copy()
     if comm_semantic is not None and len(comm_semantic):
         comm_metrics = comm_metrics.merge(comm_semantic, on=["community_id", "comm_size"], how="left")
 
     comm_metrics = comm_metrics.sort_values(["comm_size"], ascending=False).reset_index(drop=True)
 
-    # structural metrics (optional)
+
     try:
         import igraph  # noqa
         from osnclusters.metrics.structural import structural_metrics_igraph
@@ -231,7 +231,7 @@ def run_one_dataset(
         if logger:
             logger.warning(f"[C7] structural metrics skipped (igraph missing). Reason: {type(e).__name__}: {e}")
 
-    # spatial baseline (with post_min_comm_size)
+
     seed = int(cfg.get("run", {}).get("seed", 42))
     n_rand = int(cfg.get("metrics", {}).get("random_baseline_runs", 10))
     post_min = int(cfg.get("metrics", {}).get("post_min_comm_size", 1))
@@ -259,9 +259,9 @@ def run_one_dataset(
         "preprocess_d_min_degree": int(d),
     }
 
-    # add semantic summary (optional)
+
     if comm_semantic is not None and len(comm_semantic):
-        # median entropy across communities (after post_min filter)
+
         metrics_global.update({
             "venue_entropy_median": float(pd.to_numeric(comm_semantic["venue_entropy"], errors="coerce").median()),
             "venue_entropy_norm_median": float(pd.to_numeric(comm_semantic["venue_entropy_norm"], errors="coerce").median()),
@@ -272,7 +272,7 @@ def run_one_dataset(
     if logger:
         logger.info(f"[C7] global metrics: {metrics_global}")
 
-    # Save artifacts
+
     paths = make_artifact_paths(run_dir, dataset_name)
     save_df(edges_clean, paths["edges_clean"])
     save_df(checkins_clean, paths["checkins_clean"])
@@ -283,7 +283,7 @@ def run_one_dataset(
     save_npy(X_users, paths["X_users"])
     save_npy(Z, paths["Z"])
     save_df(comm_df, paths["comm_df"])
-    save_df(comm_metrics, paths["comm_metrics"])  # NOTE: now merged spatial+semantic
+    save_df(comm_metrics, paths["comm_metrics"])  
     save_json(metrics_global, paths["metrics_global"])
 
     return RunResult(dataset=dataset_name, comm_df=comm_df, comm_metrics_df=comm_metrics, metrics_global=metrics_global)

@@ -40,10 +40,7 @@ def _can_parquet() -> bool:
 
 
 def save_df(df: pd.DataFrame, path: Path) -> None:
-    """
-    Save dataframe to parquet if available, else fallback to csv.
-    If path suffix is '.parquet' but parquet not available, we write '.csv' instead.
-    """
+
     ensure_dir(path.parent)
     if path.suffix.lower() == ".parquet":
         if _can_parquet():

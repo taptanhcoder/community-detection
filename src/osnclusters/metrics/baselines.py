@@ -22,14 +22,9 @@ def spatial_baseline_zscore(
     user_centroids: pd.DataFrame,
     n_runs: int,
     seed: int,
-    post_min_comm_size: int = 1,  # NEW
+    post_min_comm_size: int = 1, 
 ):
-    """
-    Global spatial baseline on median(spatial_median_km) across communities.
-
-    post_min_comm_size:
-      - ignore communities with comm_size < post_min_comm_size (giảm nhiễu singleton).
-    """
+   
     comm_spatial = spatial_cohesion_metrics(comm_df, user_centroids)
 
     if post_min_comm_size > 1 and len(comm_spatial):

@@ -77,13 +77,13 @@ def semantic_cohesion_metrics(
 
         n_checkins = int(len(sub))
 
-        # venue entropy
+
         venue_counts = sub[venue_col].value_counts().to_numpy()
         venue_ent = _shannon_entropy_from_counts(venue_counts)
         venue_k = int(len(venue_counts))
         venue_ent_n = _entropy_norm(venue_ent, venue_k)
 
-        # category entropy (optional)
+
         if cat_col is not None:
             cat_vc = sub[cat_col].value_counts()
             cat_counts = cat_vc.to_numpy()

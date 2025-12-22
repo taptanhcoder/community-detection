@@ -32,7 +32,6 @@ def find_repo_root(start: Optional[Path] = None) -> Path:
 
 
 def default_cfg() -> Dict[str, Any]:
-    # Mirror Phase 1 defaults (so no KeyError like CFG['run'])
     return {
         "project": {
             "name": "community-detection",
